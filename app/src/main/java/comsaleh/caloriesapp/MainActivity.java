@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     TextView dataTxt;
@@ -27,4 +29,11 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new CaloriesRunnable(str,this)).start();
     }
 
+    public void showData(ArrayList<Nutrition> nutritionArrayList) {
+        String data = "";
+        for(Nutrition n : nutritionArrayList){
+            data+=n.toString()+"\n";
+        }
+        dataTxt.setText(data);
+    }
 }

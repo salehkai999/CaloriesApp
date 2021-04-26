@@ -3,11 +3,15 @@ package comsaleh.caloriesapp;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class CaloriesRunnable implements Runnable {
 
@@ -16,6 +20,7 @@ public class CaloriesRunnable implements Runnable {
     private static final String URL = "https://nutritionix-api.p.rapidapi.com/v1_1/search/";
     private static final String API_KEY = "8694c31524msh9489d792de20f42p137d32jsn7a3cd585ce55";
     private static final String HOST = "nutritionix-api.p.rapidapi.com";
+    private static final ArrayList<Nutrition> NUTRITION_ARRAY_LIST = new ArrayList<>();
     private String query;
 
     public CaloriesRunnable(String query,MainActivity mainActivity) {
@@ -60,10 +65,46 @@ public class CaloriesRunnable implements Runnable {
                 strBuilder.append(data).append("\n");
             }
             Log.d(TAG, "run: "+strBuilder.toString());
-
+            processData(strBuilder.toString());
         }
         catch (Exception e){
             Log.d(TAG, "run: "+e.toString());
         }
+    }
+
+    public void processData(String data){
+
+        try{
+            JSONObject jsonObject = new JSONObject(data);
+            JSONArray jsonArray = (JSONArray)jsonObject.get("hits");
+            Log.d(TAG, "processData: "+jsonArray.length());
+            NUTRITION_ARRAY_LIST.clear();
+            for(int i=0;i<jsonArray.length();i++)
+            {
+                JSONObject jObject = jsonArray.getJSONObject(i);
+                JSONObject fieldsObj = jObject.getJSONObject("fields");
+                Nutrition nutritionObj = new Nutrition();
+                nutritionObj.setName(fieldsObj.getString("item_name"));
+                nutritionObj.setSource(fieldsObj.getString("brand_name"));
+                nutritionObj.setCalories(fieldsObj.getDouble("nf_calories"));
+                nutritionObj.setFats(fieldsObj.getDouble("nf_total_fat"));
+                nutritionObj.setServing(fieldsObj.getDouble("nf_serving_size_qty"));
+                NUTRITION_ARRAY_LIST.add(nutritionObj);
+                Log.d(TAG, "processData: "+nutritionObj.toString());
+            }
+
+            this.mainActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mainActivity.showData(NUTRITION_ARRAY_LIST);
+                }
+            });
+        }
+        catch (Exception e){
+            Log.d(TAG, "processData: "+e.toString());
+        }
+
+
+
     }
 }
