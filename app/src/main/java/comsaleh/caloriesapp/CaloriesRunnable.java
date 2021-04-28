@@ -15,10 +15,15 @@ import java.util.ArrayList;
 
 public class CaloriesRunnable implements Runnable {
 
+    /* Don't forget to add internet permission to Manifest
+    *
+    *  <uses-permission android:name="android.permission.INTERNET" />
+    *
+    * */
     private MainActivity mainActivity;
     private static final String TAG = "CaloriesRunnable";
     private static final String URL = "https://nutritionix-api.p.rapidapi.com/v1_1/search/";
-    private static final String API_KEY = "8694c31524msh9489d792de20f42p137d32jsn7a3cd585ce55";
+    private static final String API_KEY = "8694c31524msh9489d792de20f42p137d32jsn7a3cd585ce55"; // Use your own API key since the source may limit the amount of requests to 50/day
     private static final String HOST = "nutritionix-api.p.rapidapi.com";
     private static final ArrayList<Nutrition> NUTRITION_ARRAY_LIST = new ArrayList<>();
     private String query;
@@ -93,7 +98,7 @@ public class CaloriesRunnable implements Runnable {
                 Log.d(TAG, "processData: "+nutritionObj.toString());
             }
 
-            this.mainActivity.runOnUiThread(new Runnable() {
+           this.mainActivity.runOnUiThread(new Runnable() { // must call using runOnUiThread otherwise it'll crash can't call UI elements from different threads
                 @Override
                 public void run() {
                     mainActivity.showData(NUTRITION_ARRAY_LIST);
